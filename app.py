@@ -119,6 +119,18 @@ def index():
         blog_posts = [blog_posts]
     return render_template('index.html', posts=blog_posts)
 
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == 'POST':
+        # adding a new blog post here
+        title = request.form['title']
+        content = request.form['content']
+        blog_post = BlogPost(title, content, "John Doe")
+        data_writer = DataWriter(str(BASE_DIR / "dictionary" / "data.json"))
+        data_writer.write_data(blog_post)
+        return redirect(url_for('index'))
+    return render_template('add.html')
+
 
 
 if __name__ == '__main__':
