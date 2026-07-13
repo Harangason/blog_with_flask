@@ -225,5 +225,27 @@ def favicon():
     return send_from_directory(BASE_DIR / "static", "favicon.ico")
 
 
+@app.route('/like/<int:id>')
+def like_post(id):
+    post_id = id
+    post = fetch_post_by_id(post_id)
+    if post is None:
+        return "Post not found", 404
+
+    blog_posts = get_posts()
+    for stored_post in blog_posts:
+        if _post_id(stored_post) == post_id:
+            current_likes = stored_post.get("likes", 0)
+            try:
+                current_likes = int(current_likes)
+            except (TypeError, ValueError):
+                current_likes = 0
+            stored_post["likes"] = current_likes + 1
+            break
+
+    data_writer = DataWriter(str(BASE_DIR / "dictionary" / "data.json"))
+    data_writer.write_data(blog_posts)
+    return redirect(url_for("index"))
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
