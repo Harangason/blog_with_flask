@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask
 
 app = Flask(__name__)
@@ -31,6 +33,17 @@ class BlogPost:
         self.title = title
         self.content = content
         self.author = author
+
+class DataLoader:
+    def __init__(self, data_file_path):
+        self.data_file_path = data_file_path
+        self.data = {}
+
+    def load_data(self):
+        with open(self.data_file_path, 'r') as file:
+            self.data = json.load(file)
+            return self.data
+
 
 @app.route('/')
 def hello_world():
