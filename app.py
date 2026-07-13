@@ -127,7 +127,25 @@ def add():
         # adding a new blog post here
         title = request.form['title']
         content = request.form['content']
-        blog_post = BlogPost(title, content, "John Doe")
+        author = request.form.get('author', 'John Doe')
+        blog_posts = get_posts()
+        if isinstance(blog_posts, dict):
+            blog_posts = [blog_posts]
+
+        existing_ids = [
+            int(post.get("id"))
+            for post in blog_posts
+            if isinstance(post, dict) and str(post.get("id")).isdigit()
+        ]
+        next_id = max(existing_ids, default=0) + 1
+
+        blog_post = {
+            "id": next_id,
+            "title": title,
+            "author": author,
+            "content": content,
+        }
+        blog_posts.append(blog_post)
         data_writer = DataWriter(str(BASE_DIR / "dictionary" / "data.json"))
         data_writer.write_data(blog_post)
         return redirect(url_for('index'))
