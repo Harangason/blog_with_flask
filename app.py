@@ -43,6 +43,10 @@ class DataLoader:
             self.data = json.load(file)
             return self.data
 
+def repository_data_loader(data_file_path):
+    data_loader = DataLoader(data_file_path)
+    return data_loader.load_data()
+
 class DataWriter:
     def __init__(self, data_file_path):
         self.data_file_path = data_file_path
@@ -88,12 +92,21 @@ class DataWriter:
             return True
         return False
 
+class UnifyIDs:
+    def __init__(self, data):
+        self.data = data
+        self.unique_ids = set()
+        self.id_counter = 1
+
+    def generate_unique_ids(self):
+        for item in self.data:
+            if "id" not in item:
+                item["id"] = self.id_counter
+                self.id_counter += 1
 
 
 
-def repository_data_loader(data_file_path):
-    data_loader = DataLoader(data_file_path)
-    return data_loader.load_data()
+
 
 
 
