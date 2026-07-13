@@ -113,8 +113,11 @@ class DataWriter:
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def index():
+    blog_posts = repository_data_loader(str(BASE_DIR / "dictionary" / "data.json"))
+    if isinstance(blog_posts, dict):
+        blog_posts = [blog_posts]
+    return render_template('index.html', posts=blog_posts)
 
 
 
