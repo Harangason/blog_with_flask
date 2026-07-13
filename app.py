@@ -149,5 +149,32 @@ def delete_post(post_id):
     data_writer.write_data(filtered_posts)
     return redirect(url_for("index"))
 
+
+@app.route('/update/<int:post_id>', methods=['GET', 'POST'])
+def update(post_id):
+    # Fetch the blog posts from the JSON file
+    post = fetch_post_by_id(post_id)
+    if post is None:
+        # Post not found
+        return "Post not found", 404
+
+    if request.method == 'POST':
+        data_file = str(BASE_DIR / "dictionary" / "data.json")
+        blog_posts = get_posts()
+        for stored_post in blog_posts:
+            if isinstance(stored_post, dict) and int(stored_post.get("id")) == post_id:
+                stored_post["title"] = request.form.get("title", stored_post.get("title"))
+                stored_post["author"] = request.form.get("author", stored_post.get("author"))
+                stored_post["content"] = request.form.get("content", stored_post.get("content"))
+                break
+
+        data_writer = DataWriter(data_file)
+        data_writer.write_data(blog_posts)
+        return redirect(url_for("index"))
+
+    # Else, it's a GET request
+    # So display the update.html page
+    return render_template('update.html', post=post)
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
