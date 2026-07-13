@@ -3,6 +3,8 @@ from flask import Flask
 
 app = Flask(__name__)
 
+BASE_DIR = Path(__file__).resolve().parent
+
 class User:
     def __init__(self, first_name, last_name):
         self.first_name = first_name
