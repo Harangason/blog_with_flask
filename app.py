@@ -132,6 +132,22 @@ def add():
     return render_template('add.html')
 
 
+@app.route('/delete/<int:post_id>')
+def delete_post(post_id):
+    data_file = str(BASE_DIR / "dictionary" / "data.json")
+    blog_posts = repository_data_loader(data_file)
+    if isinstance(blog_posts, dict):
+        blog_posts = [blog_posts]
+
+    filtered_posts = [
+        post
+        for post in blog_posts
+        if isinstance(post, dict) and int(post.get("id")) != post_id
+    ]
+
+    data_writer = DataWriter(data_file)
+    data_writer.write_data(filtered_posts)
+    return redirect(url_for("index"))
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
