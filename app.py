@@ -1,5 +1,6 @@
 import json
-from flask import Flask
+from flask import Flask, Response, redirect, render_template, request, send_from_directory, url_for
+from pathlib import Path
 
 app = Flask(__name__)
 
@@ -10,10 +11,11 @@ class User:
         self.first_name = first_name
         self.last_name = last_name
 
-        def get_full_name(self) -> str:
-            """Returns the full name of the user."""
-            if self.first_name and self.last_name:
-                return f"{self.first_name} {self.last_name}"
+    def get_full_name(self) -> str:
+        """Returns the full name of the user."""
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return ""
 
 class Blog:
     def __init__(self, content):
@@ -53,8 +55,12 @@ class DataLoader:
         self.data = {}
 
     def load_data(self):
-        with open(self.data_file_path, 'r') as file:
-            self.data = json.load(file)
+        try:
+            with open(self.data_file_path, 'r', encoding='utf-8') as file:
+                self.data = json.load(file)
+                return self.data
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.data = []
             return self.data
 
 def repository_data_loader(data_file_path):
@@ -100,22 +106,18 @@ class DataWriter:
         return self.data
 
     def write_data(self, data):
+        if isinstance(data, tuple):
+            data = list(data)
+        if isinstance(data, BlogPost):
+            data = data.__dict__
         payload = self.define_data_structure(data)
-        with open(self.data_file_path, 'w') as file:
+        with open(self.data_file_path, 'w', encoding='utf-8') as file:
             json.dump(payload, file, indent=2)
             return True
         return False
 
 
-
-
-
-
-
-
-
-@app.route('/')
-def index():
+def get_posts():
     blog_posts = repository_data_loader(str(BASE_DIR / "dictionary" / "data.json"))
     if isinstance(blog_posts, dict):
         return [blog_posts]
@@ -146,7 +148,6 @@ def index():
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
-        # adding a new blog post here
         title = request.form['title']
         content = request.form['content']
         author = request.form.get('author', 'John Doe')
@@ -169,7 +170,7 @@ def add():
         }
         blog_posts.append(blog_post)
         data_writer = DataWriter(str(BASE_DIR / "dictionary" / "data.json"))
-        data_writer.write_data(blog_post)
+        data_writer.write_data(blog_posts)
         return redirect(url_for('index'))
     return render_template('add.html')
 
@@ -177,14 +178,12 @@ def add():
 @app.route('/delete/<int:post_id>')
 def delete_post(post_id):
     data_file = str(BASE_DIR / "dictionary" / "data.json")
-    blog_posts = repository_data_loader(data_file)
-    if isinstance(blog_posts, dict):
-        blog_posts = [blog_posts]
+    blog_posts = get_posts()
 
     filtered_posts = [
         post
         for post in blog_posts
-        if isinstance(post, dict) and int(post.get("id")) != post_id
+        if _post_id(post) != post_id
     ]
 
     data_writer = DataWriter(data_file)
@@ -204,7 +203,7 @@ def update(post_id):
         data_file = str(BASE_DIR / "dictionary" / "data.json")
         blog_posts = get_posts()
         for stored_post in blog_posts:
-            if isinstance(stored_post, dict) and int(stored_post.get("id")) == post_id:
+            if _post_id(stored_post) == post_id:
                 stored_post["title"] = request.form.get("title", stored_post.get("title"))
                 stored_post["author"] = request.form.get("author", stored_post.get("author"))
                 stored_post["content"] = request.form.get("content", stored_post.get("content"))
