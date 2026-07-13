@@ -33,6 +33,18 @@ class BlogPost:
         self.content = content
         self.author = author
 
+class UnifyIDs:
+    def __init__(self, data):
+        self.data = data
+        self.unique_ids = set()
+        self.id_counter = 1
+
+    def generate_unique_ids(self):
+        for item in self.data:
+            if "id" not in item:
+                item["id"] = self.id_counter
+                self.id_counter += 1
+
 class DataLoader:
     def __init__(self, data_file_path):
         self.data_file_path = data_file_path
