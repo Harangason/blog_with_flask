@@ -86,6 +86,20 @@ class BlogAppTestCase(unittest.TestCase):
         response = self.client.get("/update/999")
         self.assertEqual(response.status_code, 404)
 
+    def test_like_post_increments_counter_and_redirects(self):
+        response = self.client.get("/like/1")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/", response.headers["Location"])
+
+        with self.data_file.open(encoding="utf-8") as file:
+            posts = json.load(file)
+        updated_post = next(post for post in posts if post["id"] == 1)
+        self.assertEqual(updated_post["likes"], 1)
+
+    def test_like_not_found_returns_404(self):
+        response = self.client.get("/like/999")
+        self.assertEqual(response.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main()

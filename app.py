@@ -79,6 +79,7 @@ class DataWriter:
                 "author": "John Doe",
                 "title": "First Post",
                 "content": "This is my first post.",
+                "likes": 0,
             }
         ]
 
@@ -101,6 +102,8 @@ class DataWriter:
             raise ValueError(
                 "Each post must be a dictionary with keys: id, author, title, content."
             )
+        for item in data:
+            item.setdefault("likes", 0)
 
         self.data = data
         return self.data
@@ -167,6 +170,7 @@ def add():
             "title": title,
             "author": author,
             "content": content,
+            "likes": 0,
         }
         blog_posts.append(blog_post)
         data_writer = DataWriter(str(BASE_DIR / "dictionary" / "data.json"))
