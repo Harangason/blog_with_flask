@@ -1,5 +1,6 @@
 import json
 
+from contourpy.util import data
 from flask import Flask
 
 app = Flask(__name__)
@@ -44,6 +45,15 @@ class DataLoader:
             self.data = json.load(file)
             return self.data
 
+class DataWriter:
+    def __init__(self, data_file_path):
+        self.data_file_path = data_file_path
+        self.data = {}
+        def write_data(self, data):
+            with open(self.data_file_path, 'w') as file:
+                json.dump(data, file)
+                return True
+            return False
 
 @app.route('/')
 def hello_world():
