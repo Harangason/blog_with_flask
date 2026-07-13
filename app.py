@@ -118,7 +118,29 @@ class DataWriter:
 def index():
     blog_posts = repository_data_loader(str(BASE_DIR / "dictionary" / "data.json"))
     if isinstance(blog_posts, dict):
-        blog_posts = [blog_posts]
+        return [blog_posts]
+    if not isinstance(blog_posts, list):
+        return []
+    return blog_posts
+
+
+def _post_id(post):
+    try:
+        return int(post.get("id"))
+    except (AttributeError, TypeError, ValueError):
+        return None
+
+
+def fetch_post_by_id(post_id):
+    for post in get_posts():
+        if _post_id(post) == post_id:
+            return post
+    return None
+
+
+@app.route('/')
+def index():
+    blog_posts = get_posts()
     return render_template('index.html', posts=blog_posts)
 
 @app.route('/add', methods=['GET', 'POST'])
