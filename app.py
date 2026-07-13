@@ -178,5 +178,13 @@ def update(post_id):
     # So display the update.html page
     return render_template('update.html', post=post)
 
+@app.route('/favicon.ico')
+def favicon():
+    favicon_path = BASE_DIR / "static" / "favicon.ico"
+    if not favicon_path.exists():
+        return Response(status=204)
+    return send_from_directory(BASE_DIR / "static", "favicon.ico")
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
