@@ -1,49 +1,59 @@
 # blog_with_flask
 
-Ein kleiner Flask-Blog mit Datei-gestützter Datenspeicherung (JSON).
+Ein kleiner Flask-Blog mit dateigestuetzter Datenspeicherung in JSON.
 
 ## Projektstruktur
 
-- `app.py` – Flask-App mit Routen für `index`, `add`, `update`, `delete`
+- `app.py` - Flask-App mit Routen fuer Anzeigen, Hinzufuegen, Bearbeiten, Loeschen und Liken von Blogbeitraegen
 - `templates/`
-  - `index.html` – zeigt Blogeinträge an (dynamisch via `posts`)
-  - `add.html` – Formular für neue Beiträge
-  - `update.html` – Formular zum Bearbeiten eines bestehenden Beitrags
-- `dictionary/data.json` – persistierte Blogdaten
-- `static/style.css` – Styling
-- `test_app.py` – Unit-Tests für die App
+  - `index.html` - zeigt alle Blogbeitraege an
+  - `add.html` - Formular fuer neue Blogbeitraege
+  - `update.html` - Formular zum Bearbeiten eines bestehenden Blogbeitrags
+- `dictionary/data.json` - gespeicherte Blogdaten
+- `static/style.css` - Styling fuer die Seite
+- `test_app.py` - Unit-Tests fuer die wichtigsten Funktionen
 
 ## Starten der App
 
 ```bash
-cd Codio/Term_3/blog_with_flask
 python app.py
 ```
 
-Standardmäßig läuft die App auf `http://127.0.0.1:5000/`.
+Die App laeuft standardmaessig auf:
 
-## Verfügbare Routen
+```text
+http://127.0.0.1:5000/
+```
+
+## Verfuegbare Routen
 
 - `GET /`
-  - Zeigt alle Blogbeiträge aus `dictionary/data.json` an.
+  - Zeigt alle Blogbeitraege aus `dictionary/data.json` an.
 - `GET /add`
-  - Zeigt das Formular zum Erstellen eines Beitrags.
+  - Zeigt das Formular zum Erstellen eines neuen Beitrags.
 - `POST /add`
-  - Speichert einen neuen Beitrag im JSON-Speicher.
+  - Speichert einen neuen Beitrag.
 - `GET /update/<post_id>`
-  - Zeigt das Bearbeitungsformular für den Beitrag mit dieser ID.
+  - Zeigt das Bearbeitungsformular fuer den Beitrag mit dieser ID.
 - `POST /update/<post_id>`
-  - Aktualisiert Titel, Autor und Inhalt dieses Beitrags.
+  - Aktualisiert Titel, Autor und Inhalt eines Beitrags.
 - `POST /delete/<post_id>`
-  - Löscht den Beitrag mit der gegebenen ID.
+  - Loescht den Beitrag mit dieser ID. Auch der letzte vorhandene Beitrag kann geloescht werden.
 - `POST /like/<post_id>`
-  - Erhoeht den Like-Zaehler dieses Beitrags.
+  - Erhoeht den Like-Zaehler eines Beitrags.
 - `GET /favicon.ico`
-  - Schickt `204`, falls kein Favicon vorhanden ist.
+  - Gibt `204 No Content` zurueck, wenn kein Favicon vorhanden ist.
+
+## Wichtige Aenderungen
+
+- Die Delete-Route verwendet jetzt `POST` statt `GET`, weil sie Daten veraendert.
+- Die Like-Route verwendet jetzt ebenfalls `POST` statt `GET`.
+- Das Loeschen funktioniert auch dann, wenn nur ein einziger Blogbeitrag existiert.
+- Nicht verwendete Klassen wurden entfernt, damit das Projekt einfacher und uebersichtlicher bleibt.
 
 ## JSON-Format
 
-`dictionary/data.json` enthält eine Liste von Objekten:
+`dictionary/data.json` enthaelt eine Liste von Blogbeitraegen:
 
 ```json
 [
@@ -51,25 +61,34 @@ Standardmäßig läuft die App auf `http://127.0.0.1:5000/`.
     "id": 1,
     "author": "John Doe",
     "title": "First Post",
-    "content": "This is my first post."
+    "content": "This is my first post.",
+    "likes": 0
   }
 ]
 ```
 
-`id` ist der Primärschlüssel pro Beitrag.
+`id` ist der eindeutige Primaerschluessel eines Beitrags. Neue IDs werden anhand der hoechsten vorhandenen ID erzeugt.
 
-## Tests ausführen
+## Tests ausfuehren
 
 ```bash
-cd Codio/Term_3/blog_with_flask
 python -m unittest test_app.py
 ```
 
-Erwartung: `Ran ... OK` bei erfolgreich bestandenen Tests.
+Die Tests pruefen unter anderem:
+
+- Anzeigen vorhandener Blogbeitraege
+- Bearbeiten eines Beitrags
+- Loeschen eines Beitrags
+- Loeschen des letzten vorhandenen Beitrags
+- Liken eines Beitrags
+- `GET` ist fuer Delete und Like nicht erlaubt
 
 ## Hinweise
 
-- Neue Beiträge landen in `dictionary/data.json` als JSON-Liste.
-- Wenn du den Datenbestand zurücksetzen willst, kannst du die `data.json` manuell leeren:
-  - `[]`
-- Nach Änderungen an Templates oder Datenlogik empfiehlt sich ein kurzer Testlauf über `unittest`.
+- Neue Blogbeitraege werden in `dictionary/data.json` gespeichert.
+- Zum Zuruecksetzen der Daten kann `dictionary/data.json` auf eine leere Liste gesetzt werden:
+
+```json
+[]
+```
