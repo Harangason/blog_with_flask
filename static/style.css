@@ -25,3 +25,34 @@ h1 {
 .post p {
     margin: 10px 0;
 }
+
+.inline-form {
+    display: inline;
+}
+
+.inline-form button,
+.post a {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font: inherit;
+    margin-right: 8px;
+    padding: 6px 10px;
+    text-decoration: none;
+}
+
+.like-button {
+    background-color: #2F80ED;
+    color: #FFF;
+}
+
+.edit-button {
+    background-color: #E0E0E0;
+    color: #333;
+}
+
+.delete-button {
+    background-color: #D64545;
+    color: #FFF;
+}

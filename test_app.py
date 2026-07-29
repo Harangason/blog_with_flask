@@ -73,7 +73,7 @@ class BlogAppTestCase(unittest.TestCase):
         self.assertEqual(updated_post["content"], "Updated content text.")
 
     def test_delete_removes_selected_post(self):
-        response = self.client.get("/delete/2")
+        response = self.client.post("/delete/2")
         self.assertEqual(response.status_code, 302)
         self.assertIn("/", response.headers["Location"])
 
@@ -82,12 +82,27 @@ class BlogAppTestCase(unittest.TestCase):
         self.assertEqual(len(posts), 1)
         self.assertEqual(posts[0]["id"], 1)
 
+    def test_delete_allows_removing_only_post(self):
+        with self.data_file.open("w", encoding="utf-8") as file:
+            json.dump([self.initial_posts[0]], file, indent=2)
+
+        response = self.client.post("/delete/1")
+        self.assertEqual(response.status_code, 302)
+
+        with self.data_file.open(encoding="utf-8") as file:
+            posts = json.load(file)
+        self.assertEqual(posts, [])
+
+    def test_delete_get_is_not_allowed(self):
+        response = self.client.get("/delete/1")
+        self.assertEqual(response.status_code, 405)
+
     def test_update_not_found_returns_404(self):
         response = self.client.get("/update/999")
         self.assertEqual(response.status_code, 404)
 
     def test_like_post_increments_counter_and_redirects(self):
-        response = self.client.get("/like/1")
+        response = self.client.post("/like/1")
         self.assertEqual(response.status_code, 302)
         self.assertIn("/", response.headers["Location"])
 
@@ -97,8 +112,12 @@ class BlogAppTestCase(unittest.TestCase):
         self.assertEqual(updated_post["likes"], 1)
 
     def test_like_not_found_returns_404(self):
-        response = self.client.get("/like/999")
+        response = self.client.post("/like/999")
         self.assertEqual(response.status_code, 404)
+
+    def test_like_get_is_not_allowed(self):
+        response = self.client.get("/like/1")
+        self.assertEqual(response.status_code, 405)
 
 
 if __name__ == '__main__':

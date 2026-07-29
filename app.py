@@ -6,49 +6,6 @@ app = Flask(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
 
-class User:
-    def __init__(self, first_name, last_name):
-        self.first_name = first_name
-        self.last_name = last_name
-
-    def get_full_name(self) -> str:
-        """Returns the full name of the user."""
-        if self.first_name and self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        return ""
-
-class Blog:
-    def __init__(self, content):
-        self.content = content
-
-    def get_content(self) -> str:
-        return self.content
-
-class Title:
-    def __init__(self, title):
-        self.title = title
-
-    def get_title(self) -> str:
-        return self.title
-
-class BlogPost:
-    def __init__(self, title, content, author):
-        self.title = title
-        self.content = content
-        self.author = author
-
-class UnifyIDs:
-    def __init__(self, data):
-        self.data = data
-        self.unique_ids = set()
-        self.id_counter = 1
-
-    def generate_unique_ids(self):
-        for item in self.data:
-            if "id" not in item:
-                item["id"] = self.id_counter
-                self.id_counter += 1
-
 class DataLoader:
     def __init__(self, data_file_path):
         self.data_file_path = data_file_path
@@ -93,6 +50,10 @@ class DataWriter:
         if isinstance(data, dict):
             data = [data]
 
+        if data == []:
+            self.data = []
+            return self.data
+
         if not data:
             self.data = post_schema
             return self.data
@@ -111,8 +72,6 @@ class DataWriter:
     def write_data(self, data):
         if isinstance(data, tuple):
             data = list(data)
-        if isinstance(data, BlogPost):
-            data = data.__dict__
         payload = self.define_data_structure(data)
         with open(self.data_file_path, 'w', encoding='utf-8') as file:
             json.dump(payload, file, indent=2)
@@ -179,7 +138,7 @@ def add():
     return render_template('add.html')
 
 
-@app.route('/delete/<int:post_id>')
+@app.route('/delete/<int:post_id>', methods=['POST'])
 def delete_post(post_id):
     data_file = str(BASE_DIR / "dictionary" / "data.json")
     blog_posts = get_posts()
@@ -229,7 +188,7 @@ def favicon():
     return send_from_directory(BASE_DIR / "static", "favicon.ico")
 
 
-@app.route('/like/<int:id>')
+@app.route('/like/<int:id>', methods=['POST'])
 def like_post(id):
     post_id = id
     post = fetch_post_by_id(post_id)

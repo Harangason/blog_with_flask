@@ -34,8 +34,10 @@ Standardmäßig läuft die App auf `http://127.0.0.1:5000/`.
   - Zeigt das Bearbeitungsformular für den Beitrag mit dieser ID.
 - `POST /update/<post_id>`
   - Aktualisiert Titel, Autor und Inhalt dieses Beitrags.
-- `GET /delete/<post_id>`
+- `POST /delete/<post_id>`
   - Löscht den Beitrag mit der gegebenen ID.
+- `POST /like/<post_id>`
+  - Erhoeht den Like-Zaehler dieses Beitrags.
 - `GET /favicon.ico`
   - Schickt `204`, falls kein Favicon vorhanden ist.
 
